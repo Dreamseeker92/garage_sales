@@ -28,7 +28,9 @@ func run() error {
 		return errors.Wrap(err, "Connecting to db")
 	}
 
-	productsHandler := handlers.NewProductsHandler(db)
+	logger := log.New(os.Stdout, "SALES :", log.LstdFlags|log.Lmicroseconds|log.Lshortfile)
+
+	productsHandler := handlers.NewProductsHandler(db, logger)
 
 	api := http.Server{
 		Addr:         config.Address(),

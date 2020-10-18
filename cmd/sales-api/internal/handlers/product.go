@@ -12,11 +12,12 @@ import (
 // application state needed by the handler methods.
 type Products struct {
 	DB *gorm.DB
+	*log.Logger
 }
 
 // Builder for Products handler
-func NewProductsHandler(db *gorm.DB) *Products {
-	return &Products{DB: db}
+func NewProductsHandler(db *gorm.DB, logger *log.Logger) *Products {
+	return &Products{DB: db, Logger: logger}
 }
 
 // List gets all products from the service layer and encodes them for the
@@ -24,14 +25,14 @@ func NewProductsHandler(db *gorm.DB) *Products {
 func (p *Products) List(w http.ResponseWriter, r *http.Request) {
 	list, err := product.List(p.DB)
 	if err != nil {
-		log.Printf("error: listing products: %s", err)
+		p.Logger.Printf("error: listing products: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	data, err := json.Marshal(list)
 	if err != nil {
-		log.Println("error marshalling result", err)
+		p.Logger.Println("error marshalling result", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -39,6 +40,6 @@ func (p *Products) List(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write(data); err != nil {
-		log.Println("error writing result", err)
+		p.Logger.Println("error writing result", err)
 	}
 }
