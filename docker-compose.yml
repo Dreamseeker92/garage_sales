@@ -1,0 +1,18 @@
+version: '3'
+
+networks:
+  shared-network:
+    driver: bridge
+
+services:
+  db:
+    container_name: sales_db
+    networks:
+      - shared-network
+    image: postgres:13-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=sales
+      - POSTGRES_PASSWORD=sales
+      - POSTGRES_DB=sales_db
