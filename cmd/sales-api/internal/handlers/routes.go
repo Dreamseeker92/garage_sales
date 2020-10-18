@@ -9,7 +9,7 @@ import (
 
 // API constructs a handler which knows about all API routes.
 func API(db *gorm.DB, logger *log.Logger) http.Handler  {
-	productsHandler := NewProductsHandler(db, logger)
+	productsHandler := NewProductsHandler(db)
 	
 	app := web.NewApp(logger)
 	app.Handle(http.MethodGet, "/v1/products", productsHandler.List)
