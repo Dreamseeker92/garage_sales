@@ -14,6 +14,11 @@ type Products struct {
 	DB *gorm.DB
 }
 
+// Builder for Products handler
+func NewProductsHandler(db *gorm.DB) *Products {
+	return &Products{DB: db}
+}
+
 // List gets all products from the service layer and encodes them for the
 // client response.
 func (p *Products) List(w http.ResponseWriter, r *http.Request) {

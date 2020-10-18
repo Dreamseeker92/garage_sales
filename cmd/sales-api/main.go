@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"garagesale/internal/platform/conf"
+	"github.com/pkg/errors"
 	"log"
 	"net/http"
 	"os"
@@ -14,14 +15,20 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func run() error {
 	config := conf.Parse()
 
 	db, err := database.Open(config.Database)
 	if err != nil {
-		log.Fatalf("error: connecting to db: %s", err)
+		return errors.Wrap(err, "Connecting to db")
 	}
 
-	productsHandler := handlers.Products{DB: db}
+	productsHandler := handlers.NewProductsHandler(db)
 
 	api := http.Server{
 		Addr:         config.Address(),
@@ -45,7 +52,7 @@ func main() {
 
 	select {
 	case err := <-serverErrors:
-		log.Fatalf("error: starting server: %s", err)
+		return errors.Wrap(err, "Starting server")
 
 	case <-shutdown:
 		log.Println("main : Start shutdown")
@@ -62,7 +69,9 @@ func main() {
 		}
 
 		if err != nil {
-			log.Fatalf("main : could not stop server gracefully : %v", err)
+			return errors.Wrap(err, "Server gracefully shutdown")
 		}
 	}
+
+	return nil
 }
