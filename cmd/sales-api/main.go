@@ -2,16 +2,15 @@ package main
 
 import (
 	"context"
+	"garagesale/cmd/sales-api/internal/handlers"
 	"garagesale/internal/platform/conf"
+	"garagesale/internal/platform/database"
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"garagesale/cmd/sales-api/internal/handlers"
-	"garagesale/internal/platform/database"
 )
 
 func main() {
@@ -30,11 +29,9 @@ func run() error {
 
 	logger := log.New(os.Stdout, "SALES :", log.LstdFlags|log.Lmicroseconds|log.Lshortfile)
 
-	productsHandler := handlers.NewProductsHandler(db, logger)
-
 	api := http.Server{
 		Addr:         config.Address(),
-		Handler:      http.HandlerFunc(productsHandler.List),
+		Handler:      handlers.API(db, logger),
 		ReadTimeout:  config.ReadTimeout(),
 		WriteTimeout: config.WriteTimeout(),
 	}

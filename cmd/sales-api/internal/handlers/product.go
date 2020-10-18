@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"garagesale/internal/product"
+	"github.com/go-chi/chi"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
@@ -31,6 +33,37 @@ func (p *Products) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data, err := json.Marshal(list)
+	if err != nil {
+		p.Logger.Println("error marshalling result", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write(data); err != nil {
+		p.Logger.Println("error writing result", err)
+	}
+}
+
+// Fetches a product by id.
+func (p *Products) Fetch(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	product, err := product.Fetch(p.DB, chi.URLParam(r, "id"))
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			p.Logger.Printf("record with id %s has not been found", id)
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			p.Logger.Printf("error: fetching a product with  id of %s: %s", id, err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		return
+	}
+
+	data, err := json.Marshal(product)
 	if err != nil {
 		p.Logger.Println("error marshalling result", err)
 		w.WriteHeader(http.StatusInternalServerError)

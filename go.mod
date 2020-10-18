@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/lib/pq v1.8.0
 	github.com/magiconair/properties v1.8.4 // indirect
