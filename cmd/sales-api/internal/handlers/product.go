@@ -34,16 +34,17 @@ func (p *Products) List(response http.ResponseWriter, request *http.Request) err
 // Fetches a product by id.
 func (p *Products) Fetch(response http.ResponseWriter, request *http.Request) error {
 	id := chi.URLParam(request, "id")
-	product, err := product.Fetch(p.DB, chi.URLParam(request, "id"))
+	product, err := product.Fetch(p.DB, id)
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.Wrapf(err, "record with id %s has not been found", id)
-		} else {
-			return errors.Wrapf(err, "error: fetching a product with  id of %s: %s", id, err)
+		switch err {
+		case gorm.ErrRecordNotFound:
+			return web.NewRequestError(err, http.StatusNotFound)
+		case gorm.ErrInvalidData:
+			return web.NewRequestError(err, http.StatusBadRequest)
+		default:
+			return errors.Wrapf(err, "getting product %q", id)
 		}
-
-		return nil
 	}
 
 	return web.Respond(response, product, http.StatusOK)

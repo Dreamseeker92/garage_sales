@@ -26,14 +26,14 @@ func NewApp(logger *log.Logger) *App {
 func (app *App) Handle(method, pattern string, handler Handler) {
 	handlerFunc := func(response http.ResponseWriter, request *http.Request) {
 		if err := handler(response, request); err != nil {
-			body := ErrorResponse{Error: err.Error()}
+			app.Logger.Println("ERROR: ", err)
 
-			if err := Respond(response, body, http.StatusInternalServerError); err != nil {
-				app.Logger.Println(err)
+			if err := RespondError(response, err); err != nil {
+				app.Logger.Println("ERROR: ", err)
 			}
 		}
-
 	}
+
 	app.mux.MethodFunc(method, pattern, handlerFunc)
 }
 
