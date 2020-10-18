@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
+	"garagesale/internal/platform/web"
 	"garagesale/internal/product"
 	"github.com/go-chi/chi"
 	"gorm.io/gorm"
@@ -32,17 +32,9 @@ func (p *Products) List(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(list)
-	if err != nil {
-		p.Logger.Println("error marshalling result", err)
+	if err := web.Respond(response, list, http.StatusOK); err != nil {
+		p.Logger.Println(err)
 		response.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	response.Header().Set("Content-Type", "application/json; charset=utf-8")
-	response.WriteHeader(http.StatusOK)
-	if _, err := response.Write(data); err != nil {
-		p.Logger.Println("error writing result", err)
 	}
 }
 
@@ -63,23 +55,15 @@ func (p *Products) Fetch(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(product)
-	if err != nil {
-		p.Logger.Println("error marshalling result", err)
+	if err := web.Respond(response, product, http.StatusOK); err != nil {
+		p.Logger.Println(err)
 		response.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	response.Header().Set("Content-Type", "application/json; charset=utf-8")
-	response.WriteHeader(http.StatusOK)
-	if _, err := response.Write(data); err != nil {
-		p.Logger.Println("error writing result", err)
 	}
 }
 
 func (p *Products) Create(response http.ResponseWriter, request *http.Request) {
 	var newProduct product.Product
-	if err := json.NewDecoder(request.Body).Decode(&newProduct); err != nil {
+	if err := web.Decode(request, &newProduct); err != nil {
 		p.Logger.Println(err)
 		response.WriteHeader(http.StatusBadRequest)
 		return
@@ -92,16 +76,8 @@ func (p *Products) Create(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(product)
-	if err != nil {
-		p.Logger.Println("error marshalling result", err)
+	if err := web.Respond(response, product, http.StatusOK); err != nil {
+		p.Logger.Println(err)
 		response.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	response.Header().Set("Content-Type", "application/json; charset=utf-8")
-	response.WriteHeader(http.StatusOK)
-	if _, err := response.Write(data); err != nil {
-		p.Logger.Println("error writing result", err)
 	}
 }
