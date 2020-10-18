@@ -1,6 +1,7 @@
 package product
 
 import (
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
@@ -22,4 +23,12 @@ func Fetch(db *gorm.DB, id string) (*Product, error) {
 	}
 
 	return product, nil
+}
+
+func Persist(db *gorm.DB, newProduct *Product) (*Product, error) {
+	if db.Create(newProduct); db.Error != nil {
+		return nil, errors.Wrapf(db.Error, "Persisting a product %v", newProduct)
+	}
+	
+	return newProduct, nil
 }

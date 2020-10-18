@@ -14,7 +14,13 @@ type Product struct {
 	Quantity int
 }
 
+// Provides uuid before persistence to the storage.
 func (p *Product) BeforeCreate(tx *gorm.DB) (err error) {
 	p.ID, err = uuid.NewV4()
 	return
+}
+
+// Factory for a Product.
+func NewProduct(name string, cost, quantity int) *Product {
+	return &Product{Name: name, Cost: cost, Quantity: quantity}
 }
