@@ -2,33 +2,32 @@ package main
 
 import (
 	"context"
+	"garagesale/internal/platform/conf"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"garagesale/cmd/sales-api/internal/handlers"
 	"garagesale/internal/platform/database"
 )
 
-const timeout = 5 * time.Second
-
 func main() {
-	db, err := database.Open()
+	config := conf.Parse()
+
+	db, err := database.Open(config.Database)
 	if err != nil {
 		log.Fatalf("error: connecting to db: %s", err)
 	}
-	defer db.Close()
 
 	productsHandler := handlers.Products{DB: db}
 
 	api := http.Server{
-		Addr:         "localhost:8000",
+		Addr:         config.Address(),
 		Handler:      http.HandlerFunc(productsHandler.List),
-		ReadTimeout:  timeout,
-		WriteTimeout: timeout,
+		ReadTimeout:  config.ReadTimeout(),
+		WriteTimeout: config.WriteTimeout(),
 	}
 
 	// Make a channel to listen for errors coming from the listener. Use a
@@ -52,13 +51,13 @@ func main() {
 		log.Println("main : Start shutdown")
 
 		// Give outstanding requests a deadline for completion.
-		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+		ctx, cancel := context.WithTimeout(context.Background(), config.ShutdownTimeout())
 		defer cancel()
 
 		// Asking listener to shutdown and load shed.
 		err := api.Shutdown(ctx)
 		if err != nil {
-			log.Printf("main : Graceful shutdown did not complete in %v : %v", timeout, err)
+			log.Printf("main : Graceful shutdown did not complete in %v : %v", config.ShutdownTimeout(), err)
 			err = api.Close()
 		}
 

@@ -1,0 +1,13 @@
+server:
+  host: "localhost"
+  port: 8000
+  read_timeout: 5
+  write_timeout: 5
+  shutdown_timeout: 5
+
+database:
+  username: "username"
+  password: "password"
+  host: "localhost"
+  name: "db_name"
+  disable_tls: true

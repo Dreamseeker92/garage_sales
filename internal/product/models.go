@@ -1,15 +1,20 @@
 package product
 
 import (
-	"time"
+	"github.com/gofrs/uuid"
+	"gorm.io/gorm"
 )
 
 // Product is an item we sell.
 type Product struct {
-	ID          string    `db:"product_id" json:"id"`
-	Name        string    `db:"name" json:"name"`
-	Cost        int       `db:"cost" json:"cost"`
-	Quantity    int       `db:"quantity" json:"quantity"`
-	DateCreated time.Time `db:"date_created" json:"date_created"`
-	DateUpdated time.Time `db:"date_updated" json:"date_updated"`
+	gorm.Model
+	ID       uuid.UUID `gorm:"type=uuid;primaryKey"`
+	Name     string
+	Cost     int
+	Quantity int
+}
+
+func (p *Product) BeforeCreate(tx *gorm.DB) (err error) {
+	p.ID, err = uuid.NewV4()
+	return
 }

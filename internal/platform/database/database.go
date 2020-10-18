@@ -1,23 +1,30 @@
 package database
 
 import (
-	"github.com/jmoiron/sqlx"
+	"garagesale/internal/platform/conf"
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"net/url"
 )
 
-func Open() (*sqlx.DB, error) {
+func Open(config *conf.DatabaseConfiguration) (*gorm.DB, error) {
+	tlsMode := "require"
+	if config.DisableTLS {
+		tlsMode = "disable"
+	}
+
 	q := url.Values{}
-	q.Set("sslmode", "disable")
-	q.Set("timezone", "utc")
-	
-	u := url.URL{
-		Scheme:   "postgres",
-		User:     url.UserPassword("sales", "sales"),
-		Host:     "localhost",
-		Path:     "sales_db",
+	q.Set("sslmode", tlsMode)
+	q.Set("timezone", config.Timezone)
+
+	pgDsn := url.URL{
+		Scheme:   config.Scheme,
+		User:     url.UserPassword(config.Username, config.Password),
+		Host:     config.Host,
+		Path:     config.Name,
 		RawQuery: q.Encode(),
 	}
-	
-	return sqlx.Open("postgres", u.String())
+
+	return gorm.Open(postgres.Open(pgDsn.String()), &gorm.Config{})
 }

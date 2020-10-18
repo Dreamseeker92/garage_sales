@@ -1,19 +1,14 @@
 package product
 
 import (
-	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 // List gets all Products from the database.
-func List(db *sqlx.DB) ([]Product, error) {
+func List(db *gorm.DB) ([]Product, error) {
 	var products []Product
-	
-	const q = `SELECT * FROM products`
-	
-	if err := db.Select(&products, q); err != nil {
-		return nil, errors.Wrap(err, "selecting products")
-	}
-	
+
+	db.Find(&products)
+
 	return products, nil
 }
