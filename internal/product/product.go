@@ -1,14 +1,15 @@
 package product
 
 import (
+	"context"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
 // List gets all Products from the database.
-func List(db *gorm.DB) ([]Product, error) {
+func List(ctx context.Context ,db *gorm.DB) ([]Product, error) {
 	var products []Product
-	if db.Find(&products); db.Error != nil {
+	if db.WithContext(ctx).Find(&products); db.Error != nil {
 		return nil, db.Error
 	}
 
@@ -16,17 +17,17 @@ func List(db *gorm.DB) ([]Product, error) {
 }
 
 // Fetches a product by a given id
-func Fetch(db *gorm.DB, id string) (*Product, error) {
+func Fetch(ctx context.Context,db *gorm.DB, id string) (*Product, error) {
 	product := new(Product)
-	if err := db.Where("id = ?", id).First(product).Error; err != nil {
+	if err := db.WithContext(ctx).Where("id = ?", id).First(product).Error; err != nil {
 		return nil, err
 	}
 
 	return product, nil
 }
 
-func Persist(db *gorm.DB, newProduct *Product) (*Product, error) {
-	if db.Create(newProduct); db.Error != nil {
+func Persist(ctx context.Context, db *gorm.DB, newProduct *Product) (*Product, error) {
+	if db.WithContext(ctx).Create(newProduct); db.Error != nil {
 		return nil, errors.Wrapf(db.Error, "Persisting a product %v", newProduct)
 	}
 	
