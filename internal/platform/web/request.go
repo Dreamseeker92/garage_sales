@@ -10,26 +10,27 @@ import (
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"gopkg.in/go-playground/validator.v9"
-	enTranslations "gopkg.in/go-playground/validator.v9/translations/en"
+	translations "gopkg.in/go-playground/validator.v9/translations/en"
 )
 
-// Holds the settings and caches for validating request struct field values.
+// validate holds the settings and caches for validating request struct values.
 var validate = validator.New()
 
-//translator is a cache for locale and translation information.
+// translator is a cache of locale and translation information.
 var translator *ut.UniversalTranslator
 
 func init() {
-	// Locale for the validator library.
+
+	// Instantiate the english locale for the validator library.
 	enLocale := en.New()
 
-	// Create a value using English as the fallback locale.
-	// Provide one ore more locales to additional language support.
-	translator := ut.New(enLocale, enLocale)
+	// Create a value using English as the fallback locale (first argument).
+	// Provide one or more arguments for additional supported locales.
+	translator = ut.New(enLocale, enLocale)
 
 	// Register the english error messages for validation errors.
 	lang, _ := translator.GetTranslator("en")
-	enTranslations.RegisterDefaultTranslations(validate, lang)
+	translations.RegisterDefaultTranslations(validate, lang)
 
 	// Use JSON tag names for errors instead of Go struct names.
 	validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
@@ -41,7 +42,9 @@ func init() {
 	})
 }
 
-// Decodes request body into dest.
+// Decode reads the body of an HTTP request looking for a JSON document. The
+// body is decoded into the provided value.
+//
 // If the provided value is a struct then it is checked for validation tags.
 func Decode(r *http.Request, val interface{}) error {
 	decoder := json.NewDecoder(r.Body)

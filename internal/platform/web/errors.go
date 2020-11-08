@@ -9,6 +9,7 @@ type FieldError struct {
 // Represents response to the client when an error occurs.
 type ErrorResponse struct {
 	Error string `json:"error"`
+	Fields []FieldError
 }
 
 // Provides web information to the request error

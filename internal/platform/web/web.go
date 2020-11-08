@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// Handler is the signature used by all application handlers in this service.
 type Handler func(http.ResponseWriter, *http.Request) error
 
 // Represents entry point for all web applications.
