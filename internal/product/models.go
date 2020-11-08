@@ -9,9 +9,9 @@ import (
 type Product struct {
 	gorm.Model
 	ID       uuid.UUID `gorm:"type=uuid;primaryKey"`
-	Name     string
-	Cost     int
-	Quantity int
+	Name     string    `validate:"required"`
+	Cost     int       `validate:"gte=0"`
+	Quantity int       `validate:"gte=1"`
 	Sold     int
 	Revenue  int
 	Sales    []Sale `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
@@ -27,7 +27,7 @@ func (p *Product) BeforeCreate(tx *gorm.DB) (err error) {
 // Note: due to haggling the Paid value might not equal Quantity sold.
 type Sale struct {
 	gorm.Model
-	Quantity  int       // Number of units sold
-	Paid      int       // Total price
+	Quantity  int       `validate:"gte=0"` // Number of units sold
+	Paid      int       `validate:"gte=0"` // Total price
 	ProductID uuid.UUID `gorm:"type:uuid;not null" json:"product_id"`
 }
