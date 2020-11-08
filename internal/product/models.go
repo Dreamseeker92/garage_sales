@@ -12,7 +12,9 @@ type Product struct {
 	Name     string
 	Cost     int
 	Quantity int
-	Sales []Sale `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Sold     int `gorm:"-"`
+	Revenue  int `gorm:"-"`
+	Sales    []Sale `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 // Provides uuid before persistence to the storage.
@@ -33,7 +35,6 @@ type Sale struct {
 	Quantity  int       // Number of units sold
 	Paid      int       // Total price
 	ProductID uuid.UUID `gorm:"type:uuid;not null" json:"product_id"`
-
 }
 
 func NewSale(quantity, paid int, productID string) *Sale {
