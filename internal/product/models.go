@@ -12,20 +12,15 @@ type Product struct {
 	Name     string
 	Cost     int
 	Quantity int
-	Sold     int `gorm:"-"`
-	Revenue  int `gorm:"-"`
-	Sales    []Sale `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Sold     int
+	Revenue  int
+	Sales    []Sale `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 }
 
 // Provides uuid before persistence to the storage.
 func (p *Product) BeforeCreate(tx *gorm.DB) (err error) {
 	p.ID, err = uuid.NewV4()
 	return
-}
-
-// Factory for a Product.
-func NewProduct(name string, cost, quantity int) *Product {
-	return &Product{Name: name, Cost: cost, Quantity: quantity}
 }
 
 // Sale represents an item of a transaction where some amount of a product was sold.
@@ -35,9 +30,4 @@ type Sale struct {
 	Quantity  int       // Number of units sold
 	Paid      int       // Total price
 	ProductID uuid.UUID `gorm:"type:uuid;not null" json:"product_id"`
-}
-
-func NewSale(quantity, paid int, productID string) *Sale {
-	uuid, _ := uuid.FromString(productID)
-	return &Sale{Quantity: quantity, Paid: paid, ProductID: uuid}
 }

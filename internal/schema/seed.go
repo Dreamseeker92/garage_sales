@@ -10,13 +10,13 @@ var seeds = []product.Product{
 		Name:     "Comic Books",
 		Cost:     50,
 		Quantity: 42,
-		Sales:    []product.Sale{{Quantity: 10, Paid: 100}},
+		Sales:    []product.Sale{{Quantity: 10, Paid: 100}, {Quantity: 20, Paid: 190}},
 	},
 	{
 		Name:     "McDonalds Toys",
 		Cost:     76,
 		Quantity: 100,
-		Sales:    []product.Sale{{Quantity: 20, Paid: 200}},
+		Sales:    []product.Sale{{Quantity: 20, Paid: 200}, {Quantity: 39, Paid: 435}},
 	},
 }
 
