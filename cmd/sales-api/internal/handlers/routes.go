@@ -15,6 +15,7 @@ func API(db *gorm.DB, logger *log.Logger) http.Handler {
 	// Products
 	app.Handle(http.MethodGet, "/v1/products", productsHandler.List)
 	app.Handle(http.MethodGet, "/v1/products/{id}", productsHandler.Fetch)
+	app.Handle(http.MethodPut, "/v1/products/{id}/update", productsHandler.Update)
 	app.Handle(http.MethodPost, "/v1/products", productsHandler.Create)
 
 	// Sales

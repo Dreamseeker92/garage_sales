@@ -8,10 +8,10 @@ import (
 // Product is an item we sell.
 type Product struct {
 	gorm.Model
-	ID       uuid.UUID `gorm:"type=uuid;primaryKey"`
-	Name     string    `validate:"required"`
-	Cost     int       `validate:"gte=0"`
-	Quantity int       `validate:"gte=1"`
+	ID       uuid.UUID      `gorm:"type=uuid;primaryKey"`
+	Name     string `validate:"required"`
+	Cost     int  `validate:"gte=0"`
+	Quantity int  `validate:"gte=1"`
 	Sold     int
 	Revenue  int
 	Sales    []Sale `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`

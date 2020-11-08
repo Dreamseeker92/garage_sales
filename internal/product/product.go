@@ -41,3 +41,18 @@ func Persist(ctx context.Context, db *gorm.DB, newProduct *Product) (*Product, e
 
 	return newProduct, nil
 }
+
+func Update(ctx context.Context, db *gorm.DB, id string, updateParams Product) error {
+	var product Product
+	fetchResult := db.WithContext(ctx).Where("id = ?", id).First(&product)
+	if fetchResult.Error != nil {
+		return errors.Wrapf(fetchResult.Error, "Fetching product with id %s", id)
+	}
+
+	if updateResult := db.Model(&product).Updates(updateParams); updateResult.Error != nil {
+		return errors.Wrapf(updateResult.Error, "Updating a product with id %s", id)
+	}
+
+	return nil
+
+}

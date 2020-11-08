@@ -66,6 +66,30 @@ func (p *Products) Create(response http.ResponseWriter, request *http.Request) e
 	return web.Respond(response, product, http.StatusOK)
 }
 
+func (p *Products) Update(response http.ResponseWriter, request *http.Request) error {
+	id := chi.URLParam(request, "id")
+
+	var updateParams product.Product
+	if err := web.Decode(request, &updateParams); err != nil {
+		return err
+	}
+
+	if err := product.Update(request.Context(), p.DB, id, updateParams); err != nil {
+		if err != nil {
+			switch err {
+			case gorm.ErrRecordNotFound:
+				return web.NewRequestError(err, http.StatusNotFound)
+			case gorm.ErrInvalidData:
+				return web.NewRequestError(err, http.StatusBadRequest)
+			default:
+				return errors.Wrapf(err, "Fetching product with id %s", id)
+			}
+		}
+	}
+
+	return web.Respond(response, nil, http.StatusNoContent)
+}
+
 func (p *Products) PersistSale(response http.ResponseWriter, request *http.Request) error {
 	var sale *product.Sale
 
